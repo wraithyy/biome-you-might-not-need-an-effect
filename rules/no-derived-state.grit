@@ -1,0 +1,9 @@
+`useEffect(() => { $body }, [$deps])` where {
+    $body <: r"[\s\S]*set[A-Z].*\([\s\S]*",
+    not $body <: r"[\s\S]*(?:fetch|await |addEventListener|\.subscribe\()[\s\S]*",
+    register_diagnostic(
+        span = $body,
+        message = "Avoid setting derived state in useEffect. Calculate during render: `const value = computeValue(dep1, dep2)`. For expensive computations, use useMemo(). See: https://react.dev/learn/you-might-not-need-an-effect#updating-state-based-on-props-or-state",
+        severity = "error"
+    )
+}

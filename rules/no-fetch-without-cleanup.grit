@@ -1,0 +1,9 @@
+`useEffect(() => { $body }, [$deps])` where {
+    $body <: r"[\s\S]*fetch\([\s\S]*",
+    not $body <: r"[\s\S]*return\s[\s\S]*",
+    register_diagnostic(
+        span = $body,
+        message = "Data fetching in useEffect without cleanup causes race conditions. Add a cleanup function: `return () => { ignore = true }`. Or use a data-fetching library (TanStack Query, SWR). See: https://react.dev/learn/you-might-not-need-an-effect#fetching-data",
+        severity = "error"
+    )
+}

@@ -1,0 +1,9 @@
+`useEffect(() => { $body }, [$deps])` where {
+    $body <: r"[\s\S]*set[A-Z]\w*\(\s*(?:''|\"\"|\`\`|null|undefined|0|false|true|\[\]|\{\})\s*\)[\s\S]*",
+    not $body <: r"[\s\S]*(?:fetch|await )[\s\S]*",
+    register_diagnostic(
+        span = $body,
+        message = "Resetting state on prop change via useEffect causes unnecessary re-renders. Use a `key` prop to reset component state, or derive the value during render. See: https://react.dev/learn/you-might-not-need-an-effect#resetting-all-state-when-a-prop-changes",
+        severity = "warn"
+    )
+}
