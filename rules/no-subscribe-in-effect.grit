@@ -1,8 +1,4 @@
 `useEffect(() => { $body }, $rest)` where {
-    $body <: r"[\s\S]*(?:addEventListener|\.subscribe)\([\s\S]*",
-    register_diagnostic(
-        span = $body,
-        message = "Subscribing to external stores in useEffect is error-prone. Use useSyncExternalStore() for external store subscriptions. See: https://react.dev/learn/you-might-not-need-an-effect#subscribing-to-an-external-store",
-        severity = "warn"
-    )
+	$body <: r"[\s\S]*(?:addEventListener|\.subscribe)\([\s\S]*",
+	register_diagnostic(span=$body, message="Subscribing to external stores in useEffect is error-prone. Use useSyncExternalStore() for external store subscriptions. See: https://react.dev/learn/you-might-not-need-an-effect#subscribing-to-an-external-store", severity="warn")
 }

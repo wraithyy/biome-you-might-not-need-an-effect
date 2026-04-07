@@ -1,9 +1,5 @@
 `useEffect(() => { $body }, [$deps])` where {
-    $body <: r"[\s\S]*on[A-Z]\w*\([\s\S]*",
-    $deps <: r"[\s\S]*on[A-Z][\s\S]*",
-    register_diagnostic(
-        span = $body,
-        message = "Calling parent callbacks (onChange, onUpdate) in useEffect delays updates and creates confusing data flow. Call the callback directly in event handlers that trigger the state change. See: https://react.dev/learn/you-might-not-need-an-effect#notifying-parent-components-about-state-changes",
-        severity = "warn"
-    )
+	$body <: r"[\s\S]*on[A-Z]\w*\([\s\S]*",
+	$deps <: r"[\s\S]*on[A-Z][\s\S]*",
+	register_diagnostic(span=$body, message="Calling parent callbacks (onChange, onUpdate) in useEffect delays updates and creates confusing data flow. Call the callback directly in event handlers that trigger the state change. See: https://react.dev/learn/you-might-not-need-an-effect#notifying-parent-components-about-state-changes", severity="warn")
 }

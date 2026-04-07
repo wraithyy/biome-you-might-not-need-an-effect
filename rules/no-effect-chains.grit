@@ -1,10 +1,6 @@
 `useEffect(() => { $body }, [$deps])` where {
-    $body <: r"[\s\S]*if\s*\([^)]+\)\s*\{?\s*[\s\S]*set[A-Z][\s\S]*",
-    not $body <: r"[\s\S]*(?:fetch|await |addEventListener|\.subscribe)\([\s\S]*",
-    not $body <: r"[\s\S]*return\s[\s\S]*",
-    register_diagnostic(
-        span = $body,
-        message = "This useEffect conditionally sets state based on other state, which may form an effect chain causing cascading re-renders. Consider calculating derived values during render or consolidating logic in event handlers. See: https://react.dev/learn/you-might-not-need-an-effect#chains-of-computations",
-        severity = "warn"
-    )
+	$body <: r"[\s\S]*if\s*\([^)]+\)\s*\{?\s*[\s\S]*set[A-Z][\s\S]*",
+	not $body <: r"[\s\S]*(?:fetch|await |addEventListener|\.subscribe)\([\s\S]*",
+	not $body <: r"[\s\S]*return\s[\s\S]*",
+	register_diagnostic(span=$body, message="This useEffect conditionally sets state based on other state, which may form an effect chain causing cascading re-renders. Consider calculating derived values during render or consolidating logic in event handlers. See: https://react.dev/learn/you-might-not-need-an-effect#chains-of-computations", severity="warn")
 }
