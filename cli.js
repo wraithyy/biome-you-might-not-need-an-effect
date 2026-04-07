@@ -46,28 +46,83 @@ function getPluginPaths(rules) {
 	return rules.map((rule) => `${PACKAGE_NAME}/rules/${rule}.grit`);
 }
 
-function readBiomeJson(cwd) {
-	const biomeJsonPath = resolve(cwd, "biome.json");
-	if (!existsSync(biomeJsonPath)) {
-		return null;
+function findBiomeConfig(cwd) {
+	for (const name of ["biome.json", "biome.jsonc"]) {
+		const filePath = resolve(cwd, name);
+		if (existsSync(filePath)) {
+			return filePath;
+		}
 	}
-	return JSON.parse(readFileSync(biomeJsonPath, "utf-8"));
+	return null;
 }
 
-function writeBiomeJson(cwd, config) {
-	const biomeJsonPath = resolve(cwd, "biome.json");
-	writeFileSync(biomeJsonPath, `${JSON.stringify(config, null, 2)}\n`);
+function stripJsonComments(text) {
+	let result = "";
+	let i = 0;
+	let inString = false;
+	while (i < text.length) {
+		if (inString) {
+			if (text[i] === "\\" && i + 1 < text.length) {
+				result += text[i] + text[i + 1];
+				i += 2;
+				continue;
+			}
+			if (text[i] === '"') {
+				inString = false;
+			}
+			result += text[i];
+			i++;
+			continue;
+		}
+		if (text[i] === '"') {
+			inString = true;
+			result += text[i];
+			i++;
+			continue;
+		}
+		if (text[i] === "/" && text[i + 1] === "/") {
+			while (i < text.length && text[i] !== "\n") {
+				i++;
+			}
+			continue;
+		}
+		if (text[i] === "/" && text[i + 1] === "*") {
+			i += 2;
+			while (i < text.length && !(text[i] === "*" && text[i + 1] === "/")) {
+				i++;
+			}
+			i += 2;
+			continue;
+		}
+		result += text[i];
+		i++;
+	}
+	return result;
+}
+
+function readBiomeConfig(cwd) {
+	const configPath = findBiomeConfig(cwd);
+	if (!configPath) {
+		return { config: null, configPath: null };
+	}
+	const raw = readFileSync(configPath, "utf-8");
+	const stripped = stripJsonComments(raw);
+	return { config: JSON.parse(stripped), configPath };
+}
+
+function writeBiomeConfig(configPath, config) {
+	writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
 }
 
 function init(args) {
 	const cwd = process.cwd();
 	const isStrict = args.includes("--strict");
 	const isForce = args.includes("--force");
-	const existing = readBiomeJson(cwd);
+	const { configPath: existingPath } = readBiomeConfig(cwd);
 
-	if (existing && !isForce) {
+	if (existingPath && !isForce) {
 		console.error(
-			"biome.json already exists. Use --force to overwrite, or use `merge` to add to existing config.",
+			`${existingPath} already exists. Use --force to overwrite, or use \`merge\` to add to existing config.`,
 		);
 		process.exit(1);
 	}
@@ -78,20 +133,23 @@ function init(args) {
 		plugins: getPluginPaths(rules),
 	};
 
-	writeBiomeJson(cwd, config);
+	const targetPath = existingPath || resolve(cwd, "biome.json");
+	writeBiomeConfig(targetPath, config);
 	const preset = isStrict ? "strict" : "recommended";
 	console.log(
-		`Created biome.json with ${preset} preset (${rules.length} rules).`,
+		`Created ${targetPath} with ${preset} preset (${rules.length} rules).`,
 	);
 }
 
 function merge(args) {
 	const cwd = process.cwd();
 	const isStrict = args.includes("--strict");
-	const config = readBiomeJson(cwd);
+	const { config, configPath } = readBiomeConfig(cwd);
 
 	if (!config) {
-		console.error("No biome.json found. Use `init` to create one.");
+		console.error(
+			"No biome.json or biome.jsonc found. Use `init` to create one.",
+		);
 		process.exit(1);
 	}
 
@@ -102,19 +160,19 @@ function merge(args) {
 	const filtered = existingPlugins.filter((p) => !p.includes(PACKAGE_NAME));
 	config.plugins = [...filtered, ...pluginPaths];
 
-	writeBiomeJson(cwd, config);
+	writeBiomeConfig(configPath, config);
 	const preset = isStrict ? "strict" : "recommended";
 	console.log(
-		`Merged ${preset} preset (${rules.length} rules) into biome.json.`,
+		`Merged ${preset} preset (${rules.length} rules) into ${configPath}.`,
 	);
 }
 
 function remove() {
 	const cwd = process.cwd();
-	const config = readBiomeJson(cwd);
+	const { config, configPath } = readBiomeConfig(cwd);
 
 	if (!config) {
-		console.error("No biome.json found.");
+		console.error("No biome.json or biome.jsonc found.");
 		process.exit(1);
 	}
 
@@ -125,9 +183,9 @@ function remove() {
 		}
 	}
 
-	writeBiomeJson(cwd, config);
+	writeBiomeConfig(configPath, config);
 	console.log(
-		"Removed all biome-you-might-not-need-an-effect rules from biome.json.",
+		`Removed all biome-you-might-not-need-an-effect rules from ${configPath}.`,
 	);
 }
 
@@ -176,8 +234,8 @@ Usage:
 
 Commands:
   init [--strict] [--force]   Create biome.json with plugin rules
-  merge [--strict]            Add plugin rules to existing biome.json
-  remove                      Remove plugin rules from biome.json
+  merge [--strict]            Add plugin rules to existing biome.json(c)
+  remove                      Remove plugin rules from biome.json(c)
   rules                       List all available rules
 
 Options:
