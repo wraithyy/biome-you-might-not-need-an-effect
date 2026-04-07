@@ -1,6 +1,6 @@
 {
 	"name": "biome-you-might-not-need-an-effect",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Biome linter plugin to detect React useEffect anti-patterns based on react.dev guidelines",
 	"license": "MIT",
 	"type": "module",
