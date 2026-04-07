@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+### Features
+
+- CLI now supports `biome.jsonc` (with comments)
+
+### Fixes
+
+- Plugin paths now use `./node_modules/` prefix so Biome can resolve them correctly
+- Fixed lint/formatting issues in all source files
+
 ## 0.1.0
 
 Initial release.
