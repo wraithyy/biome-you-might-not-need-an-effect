@@ -43,7 +43,9 @@ const RULE_SEVERITIES = {
 };
 
 function getPluginPaths(rules) {
-	return rules.map((rule) => `${PACKAGE_NAME}/rules/${rule}.grit`);
+	return rules.map(
+		(rule) => `./node_modules/${PACKAGE_NAME}/rules/${rule}.grit`,
+	);
 }
 
 function findBiomeConfig(cwd) {

@@ -44,11 +44,11 @@ Add the plugin paths directly to your `biome.json`:
 {
   "$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
   "plugins": [
-    "biome-you-might-not-need-an-effect/rules/no-derived-state.grit",
-    "biome-you-might-not-need-an-effect/rules/no-state-reset-effect.grit",
-    "biome-you-might-not-need-an-effect/rules/no-network-in-effect.grit",
-    "biome-you-might-not-need-an-effect/rules/no-fetch-without-cleanup.grit",
-    "biome-you-might-not-need-an-effect/rules/no-subscribe-in-effect.grit"
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-derived-state.grit",
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-state-reset-effect.grit",
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-network-in-effect.grit",
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-fetch-without-cleanup.grit",
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-subscribe-in-effect.grit"
   ]
 }
 ```
