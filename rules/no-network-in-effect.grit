@@ -1,4 +1,4 @@
 `useEffect(() => { $body }, [$deps])` where {
-	$body <: r"[\s\S]*if\s*\([^)]*\)[\s\S]*(?:fetch|axios\.(?:post|put|patch|delete))\([\s\S]*",
+	$body <: r"[\s\S]*if\s*\([^)]*\)[\s\S]*(?:fetch\([^)]*\{[\s\S]*method\s*:|axios\.(?:post|put|patch|delete)\()[\s\S]*",
 	register_diagnostic(span=$body, message="Network requests triggered by state changes belong in event handlers, not useEffect. Move the request to the handler that caused the change. See: https://react.dev/learn/you-might-not-need-an-effect#sending-a-post-request", severity="warn")
 }
