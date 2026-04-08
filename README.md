@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="./logo.svg" width="128" height="128" alt="biome-you-might-not-need-an-effect" />
-</p>
-
 <h1 align="center">biome-you-might-not-need-an-effect</h1>
 
 <p align="center">
