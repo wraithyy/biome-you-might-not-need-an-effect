@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://biomejs.dev/img/biome-logo.svg" width="64" height="64" alt="Biome" />
+  <img src="./logo.svg" width="128" height="128" alt="biome-you-might-not-need-an-effect" />
 </p>
 
 <h1 align="center">biome-you-might-not-need-an-effect</h1>
