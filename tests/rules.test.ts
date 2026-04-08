@@ -19,8 +19,11 @@ const rules = [
 	"no-network-in-effect",
 	"no-fetch-without-cleanup",
 	"no-subscribe-in-effect",
+	"no-timer-without-cleanup",
+	"no-direct-dom-subscription",
 	"no-effect-chains",
 	"no-parent-callback-effect",
+	"no-observer-in-effect",
 ] as const;
 
 for (const rule of rules) {

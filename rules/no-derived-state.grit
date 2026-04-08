@@ -1,8 +1,13 @@
-`useEffect(() => { $body }, [$deps])` where {
+or {
+	`useEffect(() => { $body }, [$deps])`,
+	`useEffect(() => $body, [$deps])`
+} where {
 	$deps <: r"[\s\S]+",
 	$body <: r"[\s\S]*set[A-Z].*\([\s\S]*",
 	not $body <: r"[\s\S]*(?:fetch|await |addEventListener|\.subscribe\()[\s\S]*",
 	not $body <: r"[\s\S]*if\s*\([\s\S]*set[A-Z][\s\S]*",
 	not $body <: r"[\s\S]*set[A-Z]\w*\(\s*(?:''|\"\"|\`\`|null|undefined|0|false|true|\[\]|\{\})\s*\)[\s\S]*",
+	not $body <: r"[\s\S]*return\s[\s\S]*",
+	not $body <: r"[\s\S]*(?:setTimeout|setInterval)\([\s\S]*",
 	register_diagnostic(span=$body, message="Avoid setting derived state in useEffect. Calculate during render: `const value = computeValue(dep1, dep2)`. For expensive computations, use useMemo(). See: https://react.dev/learn/you-might-not-need-an-effect#updating-state-based-on-props-or-state", severity="error")
 }

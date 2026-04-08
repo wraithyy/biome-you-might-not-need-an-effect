@@ -1,0 +1,4 @@
+`useEffect(() => { $body }, $rest)` where {
+	$body <: r"[\s\S]*new\s+(?:Intersection|Mutation|Resize)Observer\([\s\S]*",
+	register_diagnostic(span=$body, message="Browser Observer APIs in useEffect can often be replaced with ref callbacks for cleaner lifecycle management. See: https://react.dev/learn/you-might-not-need-an-effect#subscribing-to-an-external-store", severity="warn")
+}

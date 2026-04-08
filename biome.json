@@ -6,8 +6,11 @@
 		"./rules/no-network-in-effect.grit",
 		"./rules/no-fetch-without-cleanup.grit",
 		"./rules/no-subscribe-in-effect.grit",
+		"./rules/no-timer-without-cleanup.grit",
+		"./rules/no-direct-dom-subscription.grit",
 		"./rules/no-effect-chains.grit",
-		"./rules/no-parent-callback-effect.grit"
+		"./rules/no-parent-callback-effect.grit",
+		"./rules/no-observer-in-effect.grit"
 	],
 	"linter": {
 		"enabled": true

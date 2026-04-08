@@ -5,6 +5,8 @@
 		"./node_modules/biome-you-might-not-need-an-effect/rules/no-state-reset-effect.grit",
 		"./node_modules/biome-you-might-not-need-an-effect/rules/no-network-in-effect.grit",
 		"./node_modules/biome-you-might-not-need-an-effect/rules/no-fetch-without-cleanup.grit",
-		"./node_modules/biome-you-might-not-need-an-effect/rules/no-subscribe-in-effect.grit"
+		"./node_modules/biome-you-might-not-need-an-effect/rules/no-subscribe-in-effect.grit",
+		"./node_modules/biome-you-might-not-need-an-effect/rules/no-timer-without-cleanup.grit",
+		"./node_modules/biome-you-might-not-need-an-effect/rules/no-direct-dom-subscription.grit"
 	]
 }

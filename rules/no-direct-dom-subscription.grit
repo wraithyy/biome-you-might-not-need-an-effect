@@ -1,0 +1,4 @@
+`useEffect(() => { $body }, $rest)` where {
+	$body <: r"[\s\S]*\.on(?:message|open|close|error|connect)\s*=[\s\S]*",
+	register_diagnostic(span=$body, message="Direct event handler assignment (onmessage, onerror, etc.) in useEffect is a subscription pattern. Consider using addEventListener or useSyncExternalStore for better cleanup and concurrent rendering support. See: https://react.dev/learn/you-might-not-need-an-effect#subscribing-to-an-external-store", severity="warn")
+}

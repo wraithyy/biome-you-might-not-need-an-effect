@@ -36,7 +36,7 @@ That's it. The CLI adds the recommended rules to your existing `biome.json` (or 
 
 ## Rules
 
-### Recommended preset (5 rules)
+### Recommended preset (7 rules)
 
 Low false-positive rules suitable for any React codebase.
 
@@ -47,8 +47,10 @@ Low false-positive rules suitable for any React codebase.
 | [`no-network-in-effect`](#no-network-in-effect) | warn | POST/PUT/PATCH/DELETE triggered by state changes |
 | [`no-fetch-without-cleanup`](#no-fetch-without-cleanup) | error | Data fetching without a cleanup function (race conditions) |
 | [`no-subscribe-in-effect`](#no-subscribe-in-effect) | warn | Manual subscriptions that should use `useSyncExternalStore` |
+| [`no-timer-without-cleanup`](#no-timer-without-cleanup) | error | `setInterval`/`setTimeout` without cleanup (memory leaks) |
+| [`no-direct-dom-subscription`](#no-direct-dom-subscription) | warn | Direct `.onmessage`/`.onerror` assignment instead of `addEventListener` |
 
-### Strict preset (+2 rules)
+### Strict preset (+3 rules)
 
 Additional heuristic rules for greenfield projects. May require occasional suppression.
 
@@ -56,6 +58,7 @@ Additional heuristic rules for greenfield projects. May require occasional suppr
 |:-----|:--------:|:----------------|
 | [`no-effect-chains`](#no-effect-chains) | warn | Conditional `setState` in effects creating cascading re-renders |
 | [`no-parent-callback-effect`](#no-parent-callback-effect) | warn | Calling `onChange`/`onUpdate` callbacks inside effects |
+| [`no-observer-in-effect`](#no-observer-in-effect) | warn | Browser Observer APIs that could use ref callbacks instead |
 
 ## Setup
 
@@ -91,9 +94,12 @@ Add the plugin paths to your `biome.json`:
     "./node_modules/biome-you-might-not-need-an-effect/rules/no-network-in-effect.grit",
     "./node_modules/biome-you-might-not-need-an-effect/rules/no-fetch-without-cleanup.grit",
     "./node_modules/biome-you-might-not-need-an-effect/rules/no-subscribe-in-effect.grit",
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-timer-without-cleanup.grit",
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-direct-dom-subscription.grit",
     // strict
     "./node_modules/biome-you-might-not-need-an-effect/rules/no-effect-chains.grit",
-    "./node_modules/biome-you-might-not-need-an-effect/rules/no-parent-callback-effect.grit"
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-parent-callback-effect.grit",
+    "./node_modules/biome-you-might-not-need-an-effect/rules/no-observer-in-effect.grit"
   ]
 }
 ```
@@ -203,6 +209,51 @@ useEffect(() => {
 const value = useSyncExternalStore(store.subscribe, store.getSnapshot);
 ```
 
+### no-timer-without-cleanup
+
+Timers (`setInterval`, `setTimeout`) in `useEffect` without a cleanup function cause memory leaks and stacking intervals. Always return a cleanup function that clears the timer.
+
+```tsx
+// Bad - interval stacks on every re-render
+useEffect(() => {
+  const id = setInterval(() => {
+    fetch(url).then(r => r.json()).then(setData);
+  }, 5000);
+}, [url]);
+
+// Good - cleanup prevents stacking
+useEffect(() => {
+  const id = setInterval(() => {
+    fetch(url).then(r => r.json()).then(setData);
+  }, 5000);
+  return () => clearInterval(id);
+}, [url]);
+```
+
+### no-direct-dom-subscription
+
+Direct event handler assignment (`.onmessage`, `.onerror`, `.onopen`, etc.) in `useEffect` is a subscription pattern. Prefer `addEventListener` or `useSyncExternalStore` for better cleanup and concurrent rendering support.
+
+```tsx
+// Bad - direct assignment
+useEffect(() => {
+  const ws = new WebSocket(url);
+  ws.onmessage = (e) => setMessages((prev) => [...prev, e.data]);
+  return () => ws.close();
+}, [url]);
+
+// Good - addEventListener pattern
+useEffect(() => {
+  const ws = new WebSocket(url);
+  const handler = (e) => setMessages((prev) => [...prev, e.data]);
+  ws.addEventListener("message", handler);
+  return () => {
+    ws.removeEventListener("message", handler);
+    ws.close();
+  };
+}, [url]);
+```
+
 ### no-effect-chains
 
 *Strict only.* Effects that conditionally set state based on other state create cascading re-renders (effect chains). Derive the value during render or consolidate logic in event handlers.
@@ -243,6 +294,31 @@ function Toggle({ onChange }) {
   }
   return <button onClick={handleClick}>Toggle</button>;
 }
+```
+
+### no-observer-in-effect
+
+*Strict only.* Browser Observer APIs (`IntersectionObserver`, `MutationObserver`, `ResizeObserver`) in `useEffect` can often be replaced with ref callbacks for cleaner lifecycle management, especially with React 19+.
+
+```tsx
+// Bad - Observer in effect
+useEffect(() => {
+  const observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) setVisible(true);
+  });
+  observer.observe(ref.current);
+  return () => observer.disconnect();
+}, []);
+
+// Good - ref callback
+const callbackRef = useCallback((node) => {
+  if (!node) return;
+  const observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) setVisible(true);
+  });
+  observer.observe(node);
+  return () => observer.disconnect();
+}, []);
 ```
 
 ## How It Works

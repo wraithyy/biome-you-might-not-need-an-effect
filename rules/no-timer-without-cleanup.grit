@@ -1,0 +1,5 @@
+`useEffect(() => { $body }, $rest)` where {
+	$body <: r"[\s\S]*(?:setInterval|setTimeout)\([\s\S]*",
+	not $body <: r"[\s\S]*return\s[\s\S]*",
+	register_diagnostic(span=$body, message="Timers (setInterval/setTimeout) in useEffect without cleanup cause memory leaks. Return a cleanup function: `return () => clearInterval(id)`. See: https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed", severity="error")
+}

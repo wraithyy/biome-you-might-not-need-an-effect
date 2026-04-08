@@ -11,12 +11,15 @@ const RECOMMENDED_RULES = [
 	"no-network-in-effect",
 	"no-fetch-without-cleanup",
 	"no-subscribe-in-effect",
+	"no-timer-without-cleanup",
+	"no-direct-dom-subscription",
 ];
 
 const STRICT_RULES = [
 	...RECOMMENDED_RULES,
 	"no-effect-chains",
 	"no-parent-callback-effect",
+	"no-observer-in-effect",
 ];
 
 const RULE_DESCRIPTIONS = {
@@ -27,9 +30,15 @@ const RULE_DESCRIPTIONS = {
 	"no-fetch-without-cleanup": "Data fetching in useEffect must have cleanup",
 	"no-subscribe-in-effect":
 		"Prefer useSyncExternalStore over useEffect subscriptions",
+	"no-timer-without-cleanup":
+		"Timers in useEffect must have cleanup to prevent leaks",
+	"no-direct-dom-subscription":
+		"Prefer addEventListener over direct .on* assignment",
 	"no-effect-chains": "Avoid cascading useEffect chains (strict)",
 	"no-parent-callback-effect":
 		"Avoid calling parent callbacks in useEffect (strict)",
+	"no-observer-in-effect":
+		"Consider ref callbacks instead of Observer in useEffect (strict)",
 };
 
 const RULE_SEVERITIES = {
